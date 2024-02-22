@@ -12,22 +12,44 @@ from PIL import Image, ImageTk, ImageDraw
 
 from config import IMG_RESIZE, keypoints
 
+
+IMG_PATH: str = r'..\bodia.jpg'
+CSV_PATH: str = r'..\input\empty.csv'
 SAVE_PATH: str = r'..\processed_images'
 VALIDATION_IMG_PATH: str = r'..\validation_images'
 SCALER: int = 4
 
 
 def get_file_name_without_extension(full_file_name: str) -> str:
+    """Extracts and returns the file name without its extension."""
     return os.path.splitext(full_file_name)[0]
 
 
 class FaceProcessor:
+    """
+    A class for processing images with people's faces.
+
+    Attributes:
+        save_path: The path where processed images are saved.
+        face_cascade_path: Path to the Haar cascade file for face detection.
+        face_cascade: The Haar cascade classifier loaded from face_cascade_path.
+    """
     def __init__(self, save_path: str = SAVE_PATH):
         self.save_path = save_path
         self.face_cascade_path = r'..\haarcascade_frontalface_alt2.xml'
         self.face_cascade = cv2.CascadeClassifier(self.face_cascade_path)
 
     def get_cropped_faces(self, img_path: str) -> List[np.ndarray]:
+        """
+        Detects faces in an image, processes them, and saves the processed images.
+
+        Args:
+            img_path: The path to the image file from which faces will be cropped.
+
+        Returns:
+            A list of flattened lists representing the grayscale cropped faces.
+        """
+
         img = cv2.imread(img_path)
         img_name = os.path.basename(img_path)
 
@@ -41,14 +63,37 @@ class FaceProcessor:
         return [face.flatten().tolist() for face in resized_faces_1_channel]
 
     def detect_faces(self, img: np.ndarray) -> Sequence[Sequence[int]]:
+        """
+        Detects faces in an image using Haar cascade classifier.
+
+        Args:
+            img: The image in which to detect faces.
+
+        Returns:
+            A list of coordinates of the detected faces.
+        """
+
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         detected_faces = self.face_cascade.detectMultiScale(gray_img, 1.1, 4)
 
         return detected_faces
 
-    def get_processed_faces(self, img: np.ndarray, detected_faces, three_channels: bool = False) -> List[np.ndarray]:
+    def get_processed_faces(self, img: np.ndarray, detected_faces: Sequence[Sequence[int]],
+                            three_channels: bool = False) -> List[np.ndarray]:
+        """
+        Processes detected faces in an image, resizing them.
+
+        Args:
+            img: The original image.
+            detected_faces: Coordinates of the detected faces.
+            three_channels: Flag to return processed faces in 3-channel BGR format. Defaults to False.
+
+        Returns:
+            A list of processed face images.
+        """
+
         if three_channels:
-            # To make the picture gray, but the dots are colored
+            # To make the picture gray, but the keypoints are colored
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
@@ -58,6 +103,14 @@ class FaceProcessor:
         return resized_faces
 
     def save_faces(self, img_name: str, images) -> None:
+        """
+        Saves processed face images to the specified save path.
+
+        Args:
+            img_name: The name of the original image file.
+            images: A list of face images to save.
+        """
+
         base_img_name = get_file_name_without_extension(img_name)
         os.makedirs(self.save_path, exist_ok=True)
 
@@ -67,7 +120,8 @@ class FaceProcessor:
 
 
 class ImageAnnotator:
-    def __init__(self, image_file):
+    """A GUI tool for annotating images with keypoints."""
+    def __init__(self, image_file: str):
         self.win = Tk()
         self.canvas = Canvas(self.win, width=IMG_RESIZE * SCALER, height=IMG_RESIZE * SCALER)
         self.canvas.pack()
@@ -90,8 +144,8 @@ class ImageAnnotator:
         self.keypoint_coordinates = []
         self.canvas.bind("<Button-1>", self.on_canvas_click)
 
-    def on_canvas_click(self, event):
-        """Handle mouse click event on canvas."""
+    def on_canvas_click(self, event) -> None:
+        """Handles mouse click events on the canvas to annotate the image."""
 
         # Draw a red point on the image at the clicked location
         img_x, img_y = event.x, event.y
@@ -112,37 +166,45 @@ class ImageAnnotator:
             self.save_image()
             self.win.destroy()
 
-    def draw_point(self, x, y, radius=5, color='#67ff58'):
+    def draw_point(self, x, y, radius: float = 5, color: str = '#67ff58') -> None:
+        """Draws a point on the image."""
         draw = ImageDraw.Draw(self.img_resized)
         draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill=color)
 
-    def save_point(self, x, y):
+    def save_point(self, x, y) -> None:
+        """Saves the coordinates of an annotated point."""
         x, y = self.convert_coordinates(x, y)
         self.keypoint_coordinates.extend([x, y])
 
     def convert_coordinates(self, x: int, y: int) -> Tuple[float, float]:
+        """Converts the coordinates from canvas scale to original image scale."""
         x = float(x) / SCALER
         y = float(y) / SCALER
         return (x if x < 96.0 else 96.0), (y if y < 96.0 else 96.0)
 
-    def update_canvas(self):
+    def update_canvas(self) -> None:
+        """Updates the canvas to reflect the current state of the annotated image."""
         self.img_tk = ImageTk.PhotoImage(self.img_resized)
         self.canvas.create_image(0, 0, anchor=NW, image=self.img_tk)
 
-    def get_image_data(self):
+    def get_image_data(self) -> Tuple[List[float], Image.Image]:
+        """Returns the annotated keypoints and the image."""
         return self.keypoint_coordinates, self.img
 
-    def save_image(self):
+    def save_image(self) -> None:
+        """Saves the annotated image with keypoints."""
         img_name = get_file_name_without_extension(self.image_file)
         annotated_img_path = os.path.join(VALIDATION_IMG_PATH, f'{img_name}_with_keypoints.jpg')
         self.img_resized.save(annotated_img_path)
 
-    def run(self):
+    def run(self) -> None:
+        """Runs the main loop of the GUI."""
         self.win.mainloop()
 
 
-def get_all_images_in_folder():
-    return [f for f in os.listdir(SAVE_PATH) if f.endswith('.jpg')]
+def get_all_images_in_folder(folder_path: str) -> List[str]:
+    """Returns a list of filenames of JPG images in the folder."""
+    return [f for f in os.listdir(folder_path) if f.endswith('.jpg')]
 
 
 def reset_folder(folder_path: str = SAVE_PATH) -> None:
@@ -170,18 +232,17 @@ def reset_folder(folder_path: str = SAVE_PATH) -> None:
 
 def append_data_to_csv(csv_path: str, coords: list[float], img: np.ndarray) -> None:
     """
-    Appends a list of coordinates and image to the end of a CSV file.
+    Appends a list of coordinates and a flattened image array to the end of a specified CSV file.
 
     Args:
         csv_path: The file path to the CSV file.
         coords: A list of coordinates to be appended.
-        img:
+        img: A NumPy array representing the image.
     """
+
     img_str = ' '.join(map(str, img))
     space_separated_img = img_str.replace(',', ' ')
     row_data = coords + [space_separated_img]
-
-    print(coords)
 
     with open(csv_path, 'a', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
@@ -193,15 +254,15 @@ def main() -> None:
 
     face_processor = FaceProcessor()
 
-    cropped_faces = face_processor.get_cropped_faces(r'..\bodia.jpg')
-    image_files = get_all_images_in_folder()
+    cropped_faces = face_processor.get_cropped_faces(IMG_PATH)
+    image_files = get_all_images_in_folder(SAVE_PATH)
 
     for image_file, face in zip(image_files, cropped_faces):
         annotator = ImageAnnotator(image_file)
         annotator.run()
 
         keypoint_coordinates, img = annotator.get_image_data()
-        append_data_to_csv(r'..\input\empty.csv', keypoint_coordinates, face)
+        append_data_to_csv(CSV_PATH, keypoint_coordinates, face)
 
 
 if __name__ == '__main__':
