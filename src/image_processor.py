@@ -13,8 +13,8 @@ from PIL import Image, ImageTk, ImageDraw
 from config import IMG_RESIZE, keypoints
 
 
-IMG_PATH: str = r'..\bodia.jpg'
-CSV_PATH: str = r'..\input\empty.csv'
+IMG_PATH: str = r'..\img.jpg'
+CSV_PATH: str = r'..\input\test.csv'
 SAVE_PATH: str = r'..\processed_images'
 VALIDATION_IMG_PATH: str = r'..\validation_images'
 SCALER: int = 4
@@ -92,9 +92,9 @@ class FaceProcessor:
             A list of processed face images.
         """
 
+        # To make the picture gray, but the keypoints are colored
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         if three_channels:
-            # To make the picture gray, but the keypoints are colored
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
         cropped_faces = [img[y:y + h, x:x + w] for (x, y, w, h) in detected_faces]
