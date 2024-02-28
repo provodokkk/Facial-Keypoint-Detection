@@ -13,13 +13,13 @@ from utils import evaluation_keypoints_plot, test_keypoints_plot
 
 
 # Create directories for saving validation and test results
-validation_result_path = './outputs/validation_results'
-test_result_path = './outputs/test_results'
+validation_result_path = '../outputs/validation_results'
+test_result_path = '../outputs/test_results'
 os.makedirs(validation_result_path, exist_ok=True)
 os.makedirs(test_result_path, exist_ok=True)
 
 # Load the pre-trained model
-model = tf.keras.models.load_model('./outputs/saved_model')
+model = tf.keras.models.load_model('../outputs/saved_model')
 print(model.summary())
 
 
@@ -64,4 +64,4 @@ if __name__ == '__main__':
     evaluate(valid_ds)
 
     print('Testing...')
-    test(test_csv_path='./input/test.csv')
+    test(test_csv_path='../input/test.csv')

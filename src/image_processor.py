@@ -13,10 +13,10 @@ from PIL import Image, ImageTk, ImageDraw
 from config import IMG_RESIZE, keypoints
 
 
-IMG_PATH: str = r'..\img.jpg'
-CSV_PATH: str = r'..\input\test.csv'
-SAVE_PATH: str = r'..\processed_images'
-VALIDATION_IMG_PATH: str = r'..\validation_images'
+IMG_PATH: str = '../img.jpg'
+CSV_PATH: str = '../input/test.csv'
+SAVE_PATH: str = '../processed_images'
+VALIDATION_IMG_PATH: str = '../validation_images'
 SCALER: int = 4
 
 
@@ -36,7 +36,7 @@ class FaceProcessor:
     """
     def __init__(self, save_path: str = SAVE_PATH):
         self.save_path = save_path
-        self.face_cascade_path = r'..\haarcascade_frontalface_alt2.xml'
+        self.face_cascade_path = '../haarcascade_frontalface_alt2.xml'
         self.face_cascade = cv2.CascadeClassifier(self.face_cascade_path)
 
     def get_cropped_faces(self, img_path: str) -> List[np.ndarray]:
@@ -115,7 +115,7 @@ class FaceProcessor:
         os.makedirs(self.save_path, exist_ok=True)
 
         for i, image in enumerate(images):
-            new_img_path = fr'{self.save_path}\{base_img_name}_{i}.jpg'
+            new_img_path = f'{self.save_path}/{base_img_name}_{i}.jpg'
             cv2.imwrite(new_img_path, image)
 
 

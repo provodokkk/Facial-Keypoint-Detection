@@ -1,4 +1,4 @@
-INPUT_PATH = './input'
+INPUT_PATH = '../input'
 
 EPOCHS = 100
 BATCH_SIZE = 32

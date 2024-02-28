@@ -66,7 +66,7 @@ def test_keypoints_plot(image: np.ndarray, outputs: np.ndarray, save_path: str,
 
     for p, point in enumerate(output_keypoint):
         plt.plot(point[0], point[1], 'r.')
-        plt.text(point[0], point[1], f"{p}")
+        plt.text(point[0], point[1], f'{p}')
 
     plt.savefig(save_path)
     plt.close()
@@ -121,5 +121,5 @@ def save_plots(history: Any) -> None:
     plt.ylabel('Loss')
     plt.legend()
 
-    plt.savefig(os.path.join('.', 'outputs', 'loss.png'))
+    plt.savefig(os.path.join('..', 'outputs', 'loss.png'))
     plt.show()

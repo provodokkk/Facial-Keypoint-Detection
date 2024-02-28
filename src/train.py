@@ -9,7 +9,7 @@ from utils import save_plots
 def train_and_evaluate():
     # Model checkpoint callback.
     model_ckpt = tf.keras.callbacks.ModelCheckpoint(
-        filepath='./outputs/saved_model',
+        filepath='../outputs/saved_model',
         monitor='val_loss',
         mode='auto',
         save_best_only=True
