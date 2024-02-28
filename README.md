@@ -94,13 +94,15 @@ python evaluate_and_test.py
 
 <a id = "anchor_5"></a>
 ### How to Add Custom Data to the Dataset
-1. Place the image in the 'src' directory.
+1. Place the image in the `src` directory.
 2. Run the following command in the terminal in the `src` directory.
 ```
 python image_processor.py
 ```
-3. Add key points in the open window.
-> Points must be added in a certain order, hints can be found below the image.
+3. Add key points in the open window.\
+`Points must be added in a certain order, hints can be found below the image.`
 
 ### Example
-![image_1](https://github.com/provodokkk/Facial-Keypoint-Detection/assets/105476685/ab8777c6-7a30-4da8-ae02-7fe65dc704b8)
+<p align="center">
+  <img src="https://github.com/provodokkk/Facial-Keypoint-Detection/assets/105476685/ab8777c6-7a30-4da8-ae02-7fe65dc704b8"/>
+</p>
